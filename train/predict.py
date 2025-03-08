@@ -31,10 +31,12 @@ X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=TESTSIZE,random_s
 X_train = X_test = X
 y_train = y_test = y
 
+'''
 # standardize the data
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
+'''
 
 # load the model
 with open('model','rb') as file:
