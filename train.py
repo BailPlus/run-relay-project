@@ -1,3 +1,6 @@
+TESTSIZE = .2   # percentage of test data out of the total data
+
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
@@ -6,15 +9,13 @@ import json,os,pickle
 # load data
 # structure of data:[[<distance:float>,<avgspd:float>,<direction_change_std:float>,<isrelay:bool>],...]
 data = []   # all the samples
-for i in os.listdir('traits'):
-    print(i,end=' ')
+for i in os.listdir('train/traits'):
     file_data = []  # single sample
     isrelay = '1' == i.split('.')[1]    # distinguish isrelay from filename
-    with open(os.path.join('traits',i)) as file:
+    with open(os.path.join('train/traits',i)) as file:
         file_data.extend(json.load(file))
     file_data.append(isrelay)
     data.append(file_data)
-print()
 
 # reconstruct data
 X = []  # [[<distance:float>,<avgspd:float>,<direction_change_std:float>],...]
@@ -38,16 +39,17 @@ X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 '''
 
-# load the model
-with open('model','rb') as file:
-    clf = pickle.load(file)
+# train the model
+clf = RandomForestClassifier(n_estimators=100, random_state=42)
+clf.fit(X_train,y_train)
 
 # predict
-print(X_test)
 y_pred = clf.predict(X_test)
-print(y_pred)
 
 # assess
 accuracy = accuracy_score(y_test, y_pred)
 print(f'Accuracy: {accuracy * 100:.2f}%')
 
+# save the model
+with open('model/model','wb') as file:
+    pickle.dump(clf,file)
